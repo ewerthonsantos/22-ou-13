@@ -140,15 +140,10 @@
   }
   .pergunta-box { width: 100%; max-width: 760px; }
   .pergunta-box h2 {
-    font-family: "Anton", sans-serif; font-weight: 400; text-transform: uppercase;
-    font-size: clamp(26px, 5vw, 40px); line-height: 1.08; margin-bottom: 8px;
+    font-weight: 800; font-size: clamp(22px, 4.4vw, 32px); line-height: 1.25;
+    margin-bottom: 18px; letter-spacing: -.01em;
   }
   .pergunta-box .icone { font-size: 44px; line-height: 1; margin-bottom: 10px; }
-  .pergunta-box .explica {
-    background: var(--cartao); border: 2px dashed var(--borda);
-    padding: 12px 14px; font-size: 16px; line-height: 1.5; margin: 12px 0 18px;
-  }
-  .pergunta-box .explica::before { content: "O que é isso? "; font-weight: 800; }
   .pergunta-box .dica { color: var(--suave); margin-bottom: 14px; }
   .opcoes { display: grid; gap: 14px; }
   .opcao {
@@ -297,7 +292,6 @@
   <div class="pergunta-box">
     <div class="icone" id="icone" aria-hidden="true"></div>
     <h2 id="titulo"></h2>
-    <p class="explica" id="explica"></p>
     <p class="dica">👇 Toque na frase que você <strong>mais concorda</strong>:</p>
     <div class="opcoes" id="opcoes"></div>
     <button class="neutro" id="pular">Não sei responder essa (pular)</button>
@@ -342,100 +336,100 @@
   // que a posição (A ou B) não entregue de qual número é cada frase.
   const PERGUNTAS = [
     {
-      icone: "🏭", tema: "Empresas do governo", titulo: "Vender ou manter as estatais?",
-      explica: "Estatais são empresas que pertencem ao governo, como a Petrobras, os Correios e o Banco do Brasil.",
-      p22: "O governo deve vender algumas dessas empresas para empresários. Eles cuidariam melhor delas e o governo gastaria menos.",
-      p13: "Essas empresas devem continuar sendo do governo. Elas são importantes para o país e o lucro fica com o Brasil."
+      icone: "🏭", tema: "Empresas do governo",
+      titulo: "O que fazer com as empresas do governo, como a Petrobras, os Correios e o Banco do Brasil?",
+      p22: "Vender algumas para empresários. Eles cuidariam melhor delas e o governo gastaria menos.",
+      p13: "Continuar com o governo. Elas são importantes para o país e o lucro fica com o Brasil."
     },
     {
-      icone: "🔫", tema: "Segurança", titulo: "Armas de fogo",
-      explica: "Hoje, para ter uma arma, a pessoa precisa de autorização e cumprir várias regras.",
-      p22: "Deve ficar mais fácil comprar e andar com arma, para a pessoa poder se defender.",
-      p13: "Deve continuar difícil ter arma. Mais armas na rua podem causar mais mortes."
+      icone: "🔫", tema: "Armas",
+      titulo: "Deve ser mais fácil ou mais difícil ter uma arma de fogo?",
+      p22: "Mais fácil. A pessoa deve poder comprar e andar com arma para se defender.",
+      p13: "Mais difícil. Mais armas na rua podem causar mais mortes."
     },
     {
-      icone: "🚓", tema: "Segurança", titulo: "Como diminuir a violência?",
-      explica: "Assaltos, tráfico e violência preocupam todo mundo. Qual é o melhor caminho?",
+      icone: "🚓", tema: "Violência",
+      titulo: "Qual é o melhor jeito de diminuir assaltos, tráfico e violência?",
       p22: "Leis mais duras: mais tempo de cadeia para criminosos e mais apoio para a polícia agir.",
-      p13: "Polícias trabalhando juntas e investigando mais, e escola e emprego para os jovens não entrarem no crime."
+      p13: "Polícias trabalhando juntas e investigando mais, e escola e emprego para afastar os jovens do crime."
     },
     {
-      icone: "💰", tema: "Dinheiro do governo", titulo: "Gastos e impostos",
-      explica: "O governo recebe dinheiro dos impostos que todos pagam e decide onde gastar.",
-      p22: "O governo deve gastar menos e cobrar menos imposto de todo mundo. Assim sobra mais dinheiro para as empresas crescerem.",
-      p13: "O governo deve gastar mais com o povo e com obras. Quem é muito rico deve pagar mais imposto."
+      icone: "💰", tema: "Gastos e impostos",
+      titulo: "O governo deve gastar mais ou menos? E os impostos?",
+      p22: "Gastar menos e cobrar menos imposto de todos, para as empresas crescerem e gerarem empregos.",
+      p13: "Investir mais em saúde, escola e obras, e quem ganha muito deve pagar mais imposto."
     },
     {
-      icone: "💵", tema: "Trabalho", titulo: "Aumento do salário mínimo",
-      explica: "Todo ano o salário mínimo aumenta. A inflação é o quanto as coisas ficaram mais caras no ano.",
-      p22: "O aumento deve ser só o que o governo e as empresas conseguem pagar, para não prejudicar as contas e os empregos.",
-      p13: "O salário mínimo deve subir todo ano um pouco mais do que os preços subiram, para o trabalhador poder comprar mais."
+      icone: "💵", tema: "Salário mínimo",
+      titulo: "Quanto o salário mínimo deve aumentar todo ano?",
+      p22: "O quanto o governo e as empresas conseguirem pagar, sem prejudicar as contas e os empregos.",
+      p13: "Sempre um pouco mais do que os preços subiram, para o salário render mais no mercado."
     },
     {
-      icone: "👷", tema: "Trabalho", titulo: "Direitos do trabalhador",
-      explica: "A escala 6x1 é trabalhar 6 dias e folgar só 1 por semana.",
-      p22: "As regras do trabalho devem ser mais livres, para patrão e empregado combinarem entre si. Assim as empresas contratam mais.",
-      p13: "O trabalhador deve ter mais direitos, como trabalhar menos horas e ter 2 dias de folga por semana."
+      icone: "👷", tema: "Escala 6x1",
+      titulo: "Hoje muita gente trabalha 6 dias e folga só 1 (escala 6x1). Isso deve mudar?",
+      p22: "As regras devem ser mais livres para patrão e empregado combinarem entre si. Assim as empresas contratam mais.",
+      p13: "Deve mudar. O trabalhador deve ter 2 dias de folga por semana, sem perder salário."
     },
     {
-      icone: "🌳", tema: "Natureza", titulo: "Agronegócio e floresta",
-      explica: "Desmatar abre espaço para plantar e criar gado, mas destrói a floresta.",
-      p22: "O agronegócio dá emprego e comida ao país. As regras de proteção da natureza não podem atrapalhar quem produz.",
-      p13: "Cuidar da Amazônia e das terras dos indígenas vem primeiro. A produção deve crescer sem derrubar floresta."
+      icone: "🌳", tema: "Campo e floresta",
+      titulo: "O que deve vir primeiro: produzir mais no campo ou proteger a floresta?",
+      p22: "Produzir. O agronegócio dá emprego e comida, e as regras ambientais não podem atrapalhar quem produz.",
+      p13: "Proteger a Amazônia e as terras indígenas. Dá para produzir mais sem derrubar floresta."
     },
     {
-      icone: "🌎", tema: "Outros países", titulo: "Amigos lá fora",
-      explica: "Com quais países o Brasil deve ser mais próximo?",
-      p22: "O Brasil deve ser aliado principalmente dos Estados Unidos e dos países da Europa.",
-      p13: "O Brasil deve conversar com todos e se aproximar também da China, da Índia, da África e dos vizinhos da América Latina."
+      icone: "🌎", tema: "Outros países",
+      titulo: "O Brasil deve ser mais próximo de quais países?",
+      p22: "Principalmente dos Estados Unidos e dos países da Europa.",
+      p13: "De todos, inclusive da China, da Índia, dos países da África e dos vizinhos da América Latina."
     },
     {
-      icone: "🏛️", tema: "Justiça", titulo: "Os presos do 8 de janeiro",
-      explica: "Em 8 de janeiro de 2023, pessoas invadiram e quebraram os prédios do Congresso, do STF e do Palácio do Planalto, em Brasília. Muitas foram condenadas.",
-      p22: "Essas pessoas devem ser perdoadas (receber anistia) e sair da prisão.",
-      p13: "Essas pessoas devem cumprir as penas que a Justiça decidiu."
+      icone: "🏛️", tema: "8 de janeiro",
+      titulo: "Quem invadiu e quebrou os prédios do governo em Brasília, no 8 de janeiro de 2023, deve ser perdoado?",
+      p22: "Sim. Essas pessoas devem receber anistia (perdão) e sair da prisão.",
+      p13: "Não. Essas pessoas devem cumprir as penas que a Justiça decidiu."
     },
     {
-      icone: "⚖️", tema: "Justiça", titulo: "O STF",
-      explica: "O STF é o tribunal mais alto do país. Ele decide se as leis e o governo estão respeitando a Constituição.",
-      p22: "O STF está mandando demais e se metendo no que não é dele. O poder dele deve ser diminuído.",
-      p13: "O STF está fazendo seu trabalho de proteger as leis do país e deve continuar com o poder que tem."
+      icone: "⚖️", tema: "STF",
+      titulo: "O STF, que é o tribunal mais alto do país, tem poder demais?",
+      p22: "Sim. O STF se mete no que não é dele e deve ter menos poder.",
+      p13: "Não. O STF protege a Constituição e deve continuar com o poder que tem."
     },
     {
-      icone: "📱", tema: "Internet", titulo: "Mentiras nas redes sociais",
-      explica: "Fake news são notícias falsas que se espalham pelo WhatsApp, Instagram, TikTok e outras redes.",
-      p22: "Criar regras para as redes sociais pode virar censura. As pessoas devem ser livres para falar o que pensam.",
-      p13: "As empresas donas das redes devem ser cobradas e punidas quando deixam espalhar mentiras e crimes."
+      icone: "📱", tema: "Redes sociais",
+      titulo: "Deve haver regras contra notícias falsas (fake news) no WhatsApp, Instagram e TikTok?",
+      p22: "Não. Regras assim podem virar censura. Cada um deve ser livre para falar o que pensa.",
+      p13: "Sim. As empresas donas das redes devem ser punidas quando deixam espalhar mentiras e crimes."
     },
     {
-      icone: "🏫", tema: "Educação", titulo: "Que escola é melhor?",
-      explica: "Que tipo de escola pública é melhor para as crianças?",
-      p22: "Escolas com militares ajudando na disciplina, com mais regras e mais ordem.",
-      p13: "Escolas que funcionam o dia todo, com mais dinheiro para os professores e para as faculdades públicas."
+      icone: "🏫", tema: "Escola",
+      titulo: "Como deve ser a escola pública?",
+      p22: "Com militares ajudando na disciplina, mais regras e mais ordem.",
+      p13: "Funcionando o dia todo, com mais dinheiro para os professores e para as faculdades públicas."
     },
     {
-      icone: "🏥", tema: "Saúde", titulo: "SUS e Farmácia Popular",
-      explica: "O SUS é a saúde pública e de graça: postos, hospitais e vacinas. A Farmácia Popular dá remédios de graça ou bem baratos.",
-      p22: "O governo deve fazer parcerias com hospitais e clínicas particulares para atender mais rápido e gastar melhor o dinheiro.",
-      p13: "O governo deve colocar mais dinheiro no SUS e aumentar a lista de remédios de graça na Farmácia Popular."
+      icone: "🏥", tema: "SUS e Farmácia Popular",
+      titulo: "Como melhorar o SUS e a Farmácia Popular, que dá remédios de graça ou baratos?",
+      p22: "Fazer parcerias com hospitais e clínicas particulares para atender mais rápido e gastar melhor o dinheiro.",
+      p13: "Colocar mais dinheiro no SUS e ter mais remédios de graça na Farmácia Popular."
     },
     {
-      icone: "🏠", tema: "Moradia", titulo: "Minha Casa Minha Vida",
-      explica: "O Minha Casa Minha Vida é o programa do governo que ajuda as famílias a ter casa própria.",
-      p22: "O governo deve ajudar mais com financiamento e juros menores, para a pessoa comprar a casa pagando em parcelas.",
-      p13: "O governo deve construir muitas casas e entregar quase de graça para as famílias mais pobres."
+      icone: "🏠", tema: "Minha Casa Minha Vida",
+      titulo: "Como o governo deve ajudar as pessoas a ter a casa própria, no Minha Casa Minha Vida?",
+      p22: "Com financiamento e juros menores, para a pessoa comprar a casa pagando em parcelas.",
+      p13: "Construindo mais casas, com parcelas que cabem no bolso de quem ganha menos."
     },
     {
-      icone: "👨‍👩‍👧", tema: "Ajuda às famílias", titulo: "Bolsa Família",
-      explica: "O Bolsa Família é um dinheiro que o governo paga todo mês para as famílias pobres.",
-      p22: "A ajuda deve continuar, mas com mais cobrança para a pessoa arrumar emprego e sair do programa.",
-      p13: "A ajuda deve ser maior e garantida, com dinheiro extra para cada criança da família."
+      icone: "👨‍👩‍👧", tema: "Bolsa Família",
+      titulo: "Como deve ser o Bolsa Família, o dinheiro que o governo paga todo mês a algumas famílias?",
+      p22: "Deve continuar, mas com mais cobrança para a pessoa arrumar emprego e sair do programa.",
+      p13: "Deve continuar e aumentar, com um valor a mais para cada criança da família."
     },
     {
-      icone: "🎓", tema: "Faculdade", titulo: "Prouni e Fies",
-      explica: "O Prouni dá bolsa de estudo em faculdade particular. O Fies empresta dinheiro para pagar a faculdade.",
-      p22: "O governo deve gastar menos com faculdade e focar na escola das crianças e em cursos técnicos.",
-      p13: "O governo deve dar mais bolsas e mais empréstimos para os pobres conseguirem fazer faculdade."
+      icone: "🎓", tema: "Prouni e Fies",
+      titulo: "O governo deve ajudar quem quer fazer faculdade, com bolsas (Prouni) e crédito para pagar (Fies)?",
+      p22: "Ajudar menos. O dinheiro deve ir mais para a escola das crianças e para cursos técnicos.",
+      p13: "Ajudar mais. Dar mais bolsas de estudo e mais crédito para pagar a faculdade."
     }
   ];
 
@@ -466,7 +460,6 @@
     $("progresso").style.width = `${(atual / PERGUNTAS.length) * 100}%`;
     $("icone").textContent = p.icone;
     $("titulo").textContent = p.titulo;
-    $("explica").textContent = p.explica;
     $("voltar").disabled = atual === 0;
 
     const itens = ordem[atual] ? [["22", p.p22], ["13", p.p13]] : [["13", p.p13], ["22", p.p22]];
@@ -558,7 +551,7 @@
       selo.className = "selo s" + r;
       selo.textContent = r === "0" ? "—" : r;
       const txt = document.createElement("span");
-      txt.textContent = r === "0" ? `${p.titulo}: sem opinião` : `${p.titulo}: ${r === "22" ? p.p22 : p.p13}`;
+      txt.textContent = r === "0" ? `${p.tema}: pulou` : `${p.tema}: ${r === "22" ? p.p22 : p.p13}`;
       li.append(selo, txt);
       lista.appendChild(li);
     });
