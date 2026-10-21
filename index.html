@@ -76,7 +76,7 @@
   #intro { flex-direction: column; }
   .duelo {
     display: grid; grid-template-columns: 1fr 1fr;
-    flex: 1; min-height: 46vh; position: relative;
+    flex: none; height: 46vh; min-height: 220px; max-height: 480px; position: relative;
   }
   .duelo .lado {
     display: flex; align-items: center; justify-content: center;
@@ -232,13 +232,23 @@
   .acoes { display: flex; gap: 18px; flex-wrap: wrap; }
 
   @media (max-width: 520px) {
-    .duelo { min-height: 30vh; }
-    .duelo .lado { font-size: 96px; }
-    .intro-texto { padding-top: 24px; }
+    .duelo { height: 200px; min-height: 0; }
+    .duelo .lado { font-size: 92px; }
+    .intro-texto { padding: 22px 16px 32px; }
+    h1 { font-size: 34px; margin-bottom: 12px; }
     .intro-texto p { font-size: 16px; }
     .regras { margin: 16px 0 22px; }
     .opcao { padding: 16px 14px 16px 58px; font-size: 16px; }
     .botao { padding: 14px 24px; font-size: 16px; }
+  }
+  /* celulares de tela baixa: o botão precisa aparecer sem rolar */
+  @media (max-width: 520px) and (max-height: 720px) {
+    .duelo { height: 140px; }
+    .duelo .lado { font-size: 72px; }
+    .intro-texto { padding: 16px 16px 24px; }
+    .intro-texto p { font-size: 15px; margin-bottom: 8px; }
+    .regras { display: none; }
+    .botao { margin-top: 12px; }
   }
   /* no celular o efeito de "passar o mouse" fica grudado depois do toque */
   @media (hover: none) {
