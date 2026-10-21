@@ -143,7 +143,13 @@
     font-family: "Anton", sans-serif; font-weight: 400; text-transform: uppercase;
     font-size: clamp(26px, 5vw, 40px); line-height: 1.08; margin-bottom: 8px;
   }
-  .pergunta-box .dica { color: var(--suave); margin-bottom: 22px; }
+  .pergunta-box .icone { font-size: 44px; line-height: 1; margin-bottom: 10px; }
+  .pergunta-box .explica {
+    background: var(--cartao); border: 2px dashed var(--borda);
+    padding: 12px 14px; font-size: 16px; line-height: 1.5; margin: 12px 0 18px;
+  }
+  .pergunta-box .explica::before { content: "O que é isso? "; font-weight: 800; }
+  .pergunta-box .dica { color: var(--suave); margin-bottom: 14px; }
   .opcoes { display: grid; gap: 14px; }
   .opcao {
     font: inherit; text-align: left; cursor: pointer; width: 100%;
@@ -251,11 +257,11 @@
   <div class="intro-texto">
     <span class="etiqueta">Segundo turno · 25 de outubro</span>
     <h1>Na dúvida entre <span class="a">22</span> e <span class="v">13</span>?</h1>
-    <p>Este é um joguinho interativo de perguntas e respostas para quem ainda não decidiu o voto.</p>
-    <p>Em cada pergunta aparecem duas visões sobre um tema importante. Escolha a que está mais perto do que você pensa. No final, você descobre com qual dos dois lados mais concorda.</p>
+    <p>Este é um joguinho de perguntas e respostas para quem ainda não sabe em quem votar.</p>
+    <p>É fácil: em cada pergunta aparecem <strong>duas frases</strong>. Toque na que você mais concorda. No final, aparece qual número combina mais com você.</p>
     <div class="regras">
-      <span>12 perguntas</span>
-      <span>~3 minutos</span>
+      <span>16 perguntas</span>
+      <span>Uns 4 minutos</span>
       <span>Nenhum dado é salvo</span>
     </div>
     <button class="botao" id="comecar">Começar o jogo →</button>
@@ -272,10 +278,12 @@
     <div class="barra"><i id="progresso"></i></div>
   </div>
   <div class="pergunta-box">
+    <div class="icone" id="icone" aria-hidden="true"></div>
     <h2 id="titulo"></h2>
-    <p class="dica">Qual frase está mais perto do que você pensa?</p>
+    <p class="explica" id="explica"></p>
+    <p class="dica">👇 Toque na frase que você <strong>mais concorda</strong>:</p>
     <div class="opcoes" id="opcoes"></div>
-    <button class="neutro" id="pular">Não tenho opinião sobre isso</button>
+    <button class="neutro" id="pular">Não sei responder essa (pular)</button>
     <div class="nav">
       <button class="voltar" id="voltar">← Voltar</button>
     </div>
@@ -301,9 +309,8 @@
     <ul class="lista" id="lista"></ul>
 
     <div class="aviso">
-      <strong>Importante:</strong> as frases resumem as posições que os partidos dos dois números costumam defender, de forma simplificada. Um quiz não substitui conhecer os candidatos: leia os planos de governo oficiais no
-      <a href="https://divulgacandcontas.tse.jus.br" target="_blank" rel="noopener">site do TSE</a>
-      e acompanhe os debates antes de decidir.
+      <strong>Importante:</strong> as frases mostram, de um jeito simples, o que os partidos dos dois números costumam defender. Este jogo é só uma ajuda. Antes de votar, vale ver os debates e ler as propostas de cada candidato no
+      <a href="https://divulgacandcontas.tse.jus.br" target="_blank" rel="noopener">site do TSE</a>.
     </div>
 
     <div class="acoes">
@@ -318,76 +325,100 @@
   // que a posição (A ou B) não entregue de qual número é cada frase.
   const PERGUNTAS = [
     {
-      tema: "Economia",
-      titulo: "Empresas estatais",
-      p22: "Privatizar ou conceder estatais à iniciativa privada traz eficiência e reduz o peso do governo.",
-      p13: "Estatais como Petrobras e bancos públicos são estratégicas e devem continuar com o Estado."
+      icone: "🏭", tema: "Empresas do governo", titulo: "Vender ou manter as estatais?",
+      explica: "Estatais são empresas que pertencem ao governo, como a Petrobras, os Correios e o Banco do Brasil.",
+      p22: "O governo deve vender algumas dessas empresas para empresários. Eles cuidariam melhor delas e o governo gastaria menos.",
+      p13: "Essas empresas devem continuar sendo do governo. Elas são importantes para o país e o lucro fica com o Brasil."
     },
     {
-      tema: "Segurança",
-      titulo: "Armas",
-      p22: "O cidadão de bem deve ter mais facilidade para comprar e portar armas para se defender.",
-      p13: "Mais armas em circulação aumentam a violência; o acesso deve ser mais restrito."
+      icone: "🔫", tema: "Segurança", titulo: "Armas de fogo",
+      explica: "Hoje, para ter uma arma, a pessoa precisa de autorização e cumprir várias regras.",
+      p22: "Deve ficar mais fácil comprar e andar com arma, para a pessoa poder se defender.",
+      p13: "Deve continuar difícil ter arma. Mais armas na rua podem causar mais mortes."
     },
     {
-      tema: "Segurança",
-      titulo: "Combate ao crime",
-      p22: "O caminho é endurecer as leis: penas maiores, menos benefícios a presos e mais respaldo à polícia.",
-      p13: "O caminho é integrar as polícias, investir em inteligência e atacar as causas sociais do crime."
+      icone: "🚓", tema: "Segurança", titulo: "Como diminuir a violência?",
+      explica: "Assaltos, tráfico e violência preocupam todo mundo. Qual é o melhor caminho?",
+      p22: "Leis mais duras: mais tempo de cadeia para criminosos e mais apoio para a polícia agir.",
+      p13: "Polícias trabalhando juntas e investigando mais, e escola e emprego para os jovens não entrarem no crime."
     },
     {
-      tema: "Contas públicas",
-      titulo: "Gastos e impostos",
-      p22: "A prioridade é cortar gastos do governo e reduzir impostos para a economia crescer.",
-      p13: "O governo deve investir em programas sociais e obras, e cobrar mais de quem ganha muito."
+      icone: "💰", tema: "Dinheiro do governo", titulo: "Gastos e impostos",
+      explica: "O governo recebe dinheiro dos impostos que todos pagam e decide onde gastar.",
+      p22: "O governo deve gastar menos e cobrar menos imposto de todo mundo. Assim sobra mais dinheiro para as empresas crescerem.",
+      p13: "O governo deve gastar mais com o povo e com obras. Quem é muito rico deve pagar mais imposto."
     },
     {
-      tema: "Trabalho",
-      titulo: "Salário mínimo",
-      p22: "Aumentos do salário mínimo devem respeitar o equilíbrio das contas e não pesar para quem emprega.",
-      p13: "O salário mínimo deve ter aumento acima da inflação todo ano, garantido por lei."
+      icone: "💵", tema: "Trabalho", titulo: "Aumento do salário mínimo",
+      explica: "Todo ano o salário mínimo aumenta. A inflação é o quanto as coisas ficaram mais caras no ano.",
+      p22: "O aumento deve ser só o que o governo e as empresas conseguem pagar, para não prejudicar as contas e os empregos.",
+      p13: "O salário mínimo deve subir todo ano um pouco mais do que os preços subiram, para o trabalhador poder comprar mais."
     },
     {
-      tema: "Trabalho",
-      titulo: "Direitos trabalhistas",
-      p22: "Regras trabalhistas mais flexíveis facilitam contratar e geram mais empregos.",
-      p13: "É preciso ampliar direitos, como reduzir a jornada e acabar com a escala 6x1."
+      icone: "👷", tema: "Trabalho", titulo: "Direitos do trabalhador",
+      explica: "A escala 6x1 é trabalhar 6 dias e folgar só 1 por semana.",
+      p22: "As regras do trabalho devem ser mais livres, para patrão e empregado combinarem entre si. Assim as empresas contratam mais.",
+      p13: "O trabalhador deve ter mais direitos, como trabalhar menos horas e ter 2 dias de folga por semana."
     },
     {
-      tema: "Meio ambiente",
-      titulo: "Agro e floresta",
-      p22: "O agronegócio sustenta o país; regras ambientais e demarcações não devem travar a produção.",
-      p13: "Proteger a Amazônia e demarcar terras indígenas deve vir antes da expansão agrícola."
+      icone: "🌳", tema: "Natureza", titulo: "Agronegócio e floresta",
+      explica: "Desmatar abre espaço para plantar e criar gado, mas destrói a floresta.",
+      p22: "O agronegócio dá emprego e comida ao país. As regras de proteção da natureza não podem atrapalhar quem produz.",
+      p13: "Cuidar da Amazônia e das terras dos indígenas vem primeiro. A produção deve crescer sem derrubar floresta."
     },
     {
-      tema: "Mundo",
-      titulo: "Política externa",
-      p22: "O Brasil deve se aproximar mais dos Estados Unidos e dos países ocidentais.",
-      p13: "O Brasil deve manter distância dos dois lados e fortalecer o BRICS e a América Latina."
+      icone: "🌎", tema: "Outros países", titulo: "Amigos lá fora",
+      explica: "Com quais países o Brasil deve ser mais próximo?",
+      p22: "O Brasil deve ser aliado principalmente dos Estados Unidos e dos países da Europa.",
+      p13: "O Brasil deve conversar com todos e se aproximar também da China, da Índia, da África e dos vizinhos da América Latina."
     },
     {
-      tema: "Instituições",
-      titulo: "8 de janeiro",
-      p22: "Os condenados pelos atos de 8 de janeiro de 2023 devem receber anistia.",
-      p13: "Os responsáveis pelos atos de 8 de janeiro devem cumprir as penas definidas pela Justiça."
+      icone: "🏛️", tema: "Justiça", titulo: "Os presos do 8 de janeiro",
+      explica: "Em 8 de janeiro de 2023, pessoas invadiram e quebraram os prédios do Congresso, do STF e do Palácio do Planalto, em Brasília. Muitas foram condenadas.",
+      p22: "Essas pessoas devem ser perdoadas (receber anistia) e sair da prisão.",
+      p13: "Essas pessoas devem cumprir as penas que a Justiça decidiu."
     },
     {
-      tema: "Instituições",
-      titulo: "Supremo Tribunal Federal",
-      p22: "O STF tem interferido demais nos outros Poderes e precisa ter seu poder limitado.",
-      p13: "O STF cumpre seu papel de proteger a Constituição e deve ser preservado como está."
+      icone: "⚖️", tema: "Justiça", titulo: "O STF",
+      explica: "O STF é o tribunal mais alto do país. Ele decide se as leis e o governo estão respeitando a Constituição.",
+      p22: "O STF está mandando demais e se metendo no que não é dele. O poder dele deve ser diminuído.",
+      p13: "O STF está fazendo seu trabalho de proteger as leis do país e deve continuar com o poder que tem."
     },
     {
-      tema: "Internet",
-      titulo: "Redes sociais",
-      p22: "Regular as redes sociais abre caminho para censura; a liberdade de expressão deve vir primeiro.",
-      p13: "As plataformas devem ser responsabilizadas por conteúdos falsos e criminosos que espalham."
+      icone: "📱", tema: "Internet", titulo: "Mentiras nas redes sociais",
+      explica: "Fake news são notícias falsas que se espalham pelo WhatsApp, Instagram, TikTok e outras redes.",
+      p22: "Criar regras para as redes sociais pode virar censura. As pessoas devem ser livres para falar o que pensam.",
+      p13: "As empresas donas das redes devem ser cobradas e punidas quando deixam espalhar mentiras e crimes."
     },
     {
-      tema: "Educação",
-      titulo: "Modelo de escola",
-      p22: "Escolas cívico-militares e mais disciplina melhoram o ensino e devem ser ampliadas.",
-      p13: "A prioridade deve ser escola pública em tempo integral e mais verba para professores e universidades."
+      icone: "🏫", tema: "Educação", titulo: "Que escola é melhor?",
+      explica: "Que tipo de escola pública é melhor para as crianças?",
+      p22: "Escolas com militares ajudando na disciplina, com mais regras e mais ordem.",
+      p13: "Escolas que funcionam o dia todo, com mais dinheiro para os professores e para as faculdades públicas."
+    },
+    {
+      icone: "🏥", tema: "Saúde", titulo: "SUS e Farmácia Popular",
+      explica: "O SUS é a saúde pública e de graça: postos, hospitais e vacinas. A Farmácia Popular dá remédios de graça ou bem baratos.",
+      p22: "O governo deve fazer parcerias com hospitais e clínicas particulares para atender mais rápido e gastar melhor o dinheiro.",
+      p13: "O governo deve colocar mais dinheiro no SUS e aumentar a lista de remédios de graça na Farmácia Popular."
+    },
+    {
+      icone: "🏠", tema: "Moradia", titulo: "Minha Casa Minha Vida",
+      explica: "O Minha Casa Minha Vida é o programa do governo que ajuda as famílias a ter casa própria.",
+      p22: "O governo deve ajudar mais com financiamento e juros menores, para a pessoa comprar a casa pagando em parcelas.",
+      p13: "O governo deve construir muitas casas e entregar quase de graça para as famílias mais pobres."
+    },
+    {
+      icone: "👨‍👩‍👧", tema: "Ajuda às famílias", titulo: "Bolsa Família",
+      explica: "O Bolsa Família é um dinheiro que o governo paga todo mês para as famílias pobres.",
+      p22: "A ajuda deve continuar, mas com mais cobrança para a pessoa arrumar emprego e sair do programa.",
+      p13: "A ajuda deve ser maior e garantida, com dinheiro extra para cada criança da família."
+    },
+    {
+      icone: "🎓", tema: "Faculdade", titulo: "Prouni e Fies",
+      explica: "O Prouni dá bolsa de estudo em faculdade particular. O Fies empresta dinheiro para pagar a faculdade.",
+      p22: "O governo deve gastar menos com faculdade e focar na escola das crianças e em cursos técnicos.",
+      p13: "O governo deve dar mais bolsas e mais empréstimos para os pobres conseguirem fazer faculdade."
     }
   ];
 
@@ -415,7 +446,9 @@
     $("tema").textContent = p.tema;
     $("contador").textContent = `${atual + 1} / ${PERGUNTAS.length}`;
     $("progresso").style.width = `${(atual / PERGUNTAS.length) * 100}%`;
+    $("icone").textContent = p.icone;
     $("titulo").textContent = p.titulo;
+    $("explica").textContent = p.explica;
     $("voltar").disabled = atual === 0;
 
     const itens = ordem[atual] ? [["22", p.p22], ["13", p.p13]] : [["13", p.p13], ["22", p.p22]];
@@ -473,7 +506,7 @@
       rev.classList.add(vence === "22" ? "listra-azul" : "listra-vermelha");
       $("pre").textContent = "Suas respostas combinam mais com o";
       $("numero").textContent = vence;
-      $("afinidade").textContent = `Você concordou com o ${vence} em ${pct}% das perguntas que respondeu.`;
+      $("afinidade").textContent = `De cada 10 respostas suas, mais ou menos ${Math.round(pct / 10)} combinam com o ${vence}.`;
     }
     // reinicia a animação do número
     const num = $("numero");
