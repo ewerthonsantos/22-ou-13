@@ -1,0 +1,589 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>22 ou 13?</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --azul: #0a2463;
+    --azul-claro: #1e4fb8;
+    --vermelho: #c8102e;
+    --vermelho-claro: #ff3b4f;
+    --papel: #f4efe6;
+    --tinta: #15151a;
+    --suave: #6b6875;
+    --cartao: #fffdf8;
+    --borda: #e2dccf;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --papel: #121218;
+      --tinta: #f2efe9;
+      --suave: #a8a4b3;
+      --cartao: #1c1c25;
+      --borda: #2e2e3a;
+    }
+  }
+  :root[data-theme="dark"] {
+    --papel: #121218;
+    --tinta: #f2efe9;
+    --suave: #a8a4b3;
+    --cartao: #1c1c25;
+    --borda: #2e2e3a;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { min-height: 100%; }
+  body {
+    font-family: "Inter", system-ui, sans-serif;
+    background: var(--papel);
+    color: var(--tinta);
+    overflow-x: hidden;
+    -webkit-font-smoothing: antialiased;
+  }
+  /* textura de papel/grão por cima de tudo */
+  body::after {
+    content: "";
+    position: fixed; inset: 0;
+    pointer-events: none;
+    z-index: 100;
+    opacity: .08;
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='220' height='220'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 .9 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
+  }
+
+  button { touch-action: manipulation; -webkit-tap-highlight-color: transparent; }
+  .tela { display: none; min-height: 100vh; min-height: 100dvh; }
+  .tela.ativa { display: flex; animation: entra .5s ease both; }
+  @keyframes entra { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: none; } }
+
+  /* listras diagonais usadas nos lados */
+  .listra-azul {
+    background:
+      repeating-linear-gradient(135deg, rgba(255,255,255,.06) 0 14px, transparent 14px 28px),
+      radial-gradient(circle at 30% 20%, var(--azul-claro), var(--azul) 70%);
+  }
+  .listra-vermelha {
+    background:
+      repeating-linear-gradient(45deg, rgba(0,0,0,.08) 0 14px, transparent 14px 28px),
+      radial-gradient(circle at 70% 20%, var(--vermelho-claro), var(--vermelho) 70%);
+  }
+
+  /* ---------- INTRO ---------- */
+  #intro { flex-direction: column; }
+  .duelo {
+    display: grid; grid-template-columns: 1fr 1fr;
+    flex: none; height: 46vh; min-height: 220px; max-height: 480px; position: relative;
+  }
+  .duelo .lado {
+    display: flex; align-items: center; justify-content: center;
+    font-family: "Anton", sans-serif; color: #fff;
+    font-size: clamp(110px, 28vw, 300px); line-height: 1;
+    text-shadow: 0 6px 0 rgba(0,0,0,.25);
+  }
+  .duelo .vs {
+    position: absolute; left: 50%; top: 50%;
+    transform: translate(-50%, -50%) rotate(-8deg);
+    background: var(--papel); color: var(--tinta);
+    font-family: "Anton", sans-serif; font-size: clamp(22px, 5vw, 40px);
+    padding: 10px 18px; border: 3px solid var(--tinta);
+    box-shadow: 6px 6px 0 var(--tinta);
+  }
+  .intro-texto {
+    max-width: 640px; margin: 0 auto; padding: 40px 16px 48px; text-align: center;
+  }
+  .etiqueta {
+    display: inline-block; font-size: 12px; font-weight: 800; letter-spacing: .14em;
+    text-transform: uppercase; color: var(--suave); margin-bottom: 14px;
+  }
+  h1 {
+    font-family: "Anton", sans-serif; font-weight: 400;
+    font-size: clamp(34px, 7vw, 58px); line-height: 1.02; letter-spacing: .01em;
+    text-transform: uppercase; margin-bottom: 16px;
+  }
+  h1 .a { color: var(--azul-claro); }
+  h1 .v { color: var(--vermelho); }
+  .intro-texto .etiqueta { font-size: clamp(8px, 2.6vw, 12px); font-weight: 600; letter-spacing: 0; text-transform: none; white-space: nowrap; }
+  .intro-texto p { font-size: 17px; line-height: 1.6; color: var(--suave); margin-bottom: 12px; }
+  .regras {
+    display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; margin: 22px 0 28px;
+  }
+  .regras span {
+    border: 2px solid var(--borda); background: var(--cartao);
+    padding: 8px 14px; border-radius: 999px; font-size: 14px; font-weight: 600;
+  }
+
+  .botao {
+    font: inherit; font-weight: 800; font-size: 18px; cursor: pointer;
+    background: var(--tinta); color: var(--papel);
+    border: 3px solid var(--tinta); padding: 16px 34px;
+    box-shadow: 6px 6px 0 var(--vermelho), 12px 12px 0 var(--azul);
+    transition: transform .15s, box-shadow .15s;
+  }
+  .botao:hover { transform: translate(-2px, -2px); box-shadow: 8px 8px 0 var(--vermelho), 15px 15px 0 var(--azul); }
+  .botao:active { transform: translate(4px, 4px); box-shadow: 2px 2px 0 var(--vermelho), 4px 4px 0 var(--azul); }
+  .botao.fantasma { background: transparent; color: var(--tinta); box-shadow: none; }
+  .botao.fantasma:hover { background: var(--tinta); color: var(--papel); transform: none; }
+
+  /* ---------- QUIZ ---------- */
+  #quiz { flex-direction: column; align-items: center; padding: 24px 16px 40px; }
+  .topo { width: 100%; max-width: 760px; margin-bottom: 28px; }
+  .topo-linha { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; font-weight: 800; font-size: 14px; }
+  .topo-linha .tema { text-transform: uppercase; letter-spacing: .12em; color: var(--suave); }
+  .barra { height: 12px; border: 2px solid var(--tinta); background: var(--cartao); overflow: hidden; }
+  .barra i {
+    display: block; height: 100%; width: 0;
+    background: repeating-linear-gradient(90deg, var(--azul) 0 16px, var(--vermelho) 16px 32px);
+    transition: width .4s ease;
+  }
+  .pergunta-box { width: 100%; max-width: 760px; }
+  .pergunta-box h2 {
+    font-weight: 800; font-size: clamp(22px, 4.4vw, 32px); line-height: 1.25;
+    margin-bottom: 18px; letter-spacing: -.01em;
+  }
+  .pergunta-box .icone { font-size: 44px; line-height: 1; margin-bottom: 10px; }
+  .pergunta-box .dica { color: var(--suave); margin-bottom: 14px; }
+  .opcoes { display: grid; gap: 14px; }
+  .opcao {
+    font: inherit; text-align: left; cursor: pointer; width: 100%;
+    background: var(--cartao); color: var(--tinta);
+    border: 3px solid var(--tinta); padding: 20px 20px 20px 64px;
+    font-size: 17px; line-height: 1.45; position: relative;
+    box-shadow: 5px 5px 0 var(--tinta);
+    transition: transform .12s, box-shadow .12s, background .2s;
+  }
+  .opcao::before {
+    content: attr(data-letra);
+    position: absolute; left: 16px; top: 50%; transform: translateY(-50%);
+    width: 34px; height: 34px; border: 2px solid var(--tinta); border-radius: 50%;
+    display: grid; place-items: center; font-weight: 800; font-size: 15px;
+  }
+  .opcao:hover { transform: translate(-2px, -2px); box-shadow: 7px 7px 0 var(--tinta); }
+  .opcao.escolhida { background: var(--tinta); color: var(--papel); }
+  .opcao.escolhida::before { border-color: var(--papel); }
+  .neutro {
+    font: inherit; background: none; border: none; cursor: pointer; color: var(--suave);
+    text-decoration: underline; text-underline-offset: 4px; margin-top: 20px; font-size: 15px;
+  }
+  .neutro:hover { color: var(--tinta); }
+  .nav { display: flex; justify-content: space-between; align-items: center; margin-top: 26px; }
+  .voltar { font: inherit; background: none; border: none; cursor: pointer; font-weight: 800; color: var(--tinta); font-size: 15px; }
+  .voltar:disabled { opacity: .3; cursor: default; }
+
+  /* ---------- RESULTADO ---------- */
+  #resultado { flex-direction: column; }
+  .revelacao {
+    min-height: 78vh; display: flex; flex-direction: column; align-items: center; justify-content: center;
+    color: #fff; text-align: center; padding: 40px 16px; position: relative; overflow: hidden;
+  }
+  .revelacao.empate {
+    background:
+      repeating-linear-gradient(135deg, rgba(255,255,255,.06) 0 14px, transparent 14px 28px),
+      linear-gradient(90deg, var(--azul) 50%, var(--vermelho) 50%);
+  }
+  .revelacao .pre { font-weight: 800; letter-spacing: .16em; text-transform: uppercase; font-size: 14px; opacity: .9; margin-bottom: 14px; max-width: 320px; line-height: 1.5; }
+  .numero-gigante {
+    font-family: "Anton", sans-serif; line-height: .9;
+    font-size: clamp(180px, 48vw, 460px);
+    text-shadow: 0 10px 0 rgba(0,0,0,.25), 0 0 80px rgba(255,255,255,.15);
+    animation: pulo .9s cubic-bezier(.2, 1.6, .4, 1) both;
+  }
+  .empate .numero-gigante { font-size: clamp(110px, 26vw, 300px); white-space: nowrap; }
+  @keyframes pulo { from { transform: scale(.2) rotate(-12deg); opacity: 0; } to { transform: none; opacity: 1; } }
+  .revelacao .data {
+    font-family: "Anton", sans-serif; font-size: clamp(22px, 5vw, 36px); text-transform: uppercase;
+    background: rgba(0,0,0,.25); padding: 8px 18px; margin-top: 8px;
+  }
+  .revelacao .afinidade { margin-top: 18px; font-size: 18px; font-weight: 600; max-width: 520px; }
+
+  .detalhes { max-width: 760px; width: 100%; margin: 0 auto; padding: 40px 16px 60px; }
+  .placar { display: flex; height: 56px; border: 3px solid var(--tinta); margin-bottom: 10px; overflow: hidden; }
+  .placar div {
+    display: flex; align-items: center; justify-content: center; color: #fff;
+    font-family: "Anton", sans-serif; font-size: 22px; transition: width 1s ease; white-space: nowrap;
+  }
+  .legenda { display: flex; justify-content: space-between; font-size: 14px; color: var(--suave); margin-bottom: 34px; }
+  .detalhes h3 { font-family: "Anton", sans-serif; font-weight: 400; text-transform: uppercase; font-size: 28px; margin-bottom: 14px; }
+  .lista { list-style: none; display: grid; gap: 8px; margin-bottom: 30px; }
+  .lista li {
+    display: flex; align-items: center; gap: 12px; padding: 12px 14px;
+    background: var(--cartao); border: 2px solid var(--borda); font-size: 15px;
+  }
+  .lista .selo {
+    flex: none; width: 44px; height: 30px; display: grid; place-items: center;
+    color: #fff; font-family: "Anton", sans-serif; font-size: 17px;
+  }
+  .selo.s22 { background: var(--azul); }
+  .selo.s13 { background: var(--vermelho); }
+  .selo.s0 { background: var(--borda); color: var(--suave); font-family: "Inter", sans-serif; font-size: 12px; font-weight: 800; }
+  .aviso {
+    border-left: 5px solid var(--tinta); background: var(--cartao); padding: 16px 18px;
+    font-size: 14px; line-height: 1.6; color: var(--suave); margin-bottom: 30px;
+  }
+  .aviso strong { color: var(--tinta); }
+  .aviso a { color: var(--tinta); }
+  .acoes { display: flex; gap: 18px; flex-wrap: wrap; }
+
+  @media (max-width: 520px) {
+    .duelo { height: 200px; min-height: 0; }
+    .duelo .lado { font-size: 92px; }
+    .intro-texto { padding: 22px 16px 32px; }
+    h1 { font-size: 34px; margin-bottom: 12px; }
+    .intro-texto p { font-size: 16px; }
+    .regras { margin: 16px 0 22px; }
+    .opcao { padding: 16px 14px 16px 58px; font-size: 16px; }
+    .botao { padding: 14px 24px; font-size: 16px; }
+  }
+  /* celulares de tela baixa: o botão precisa aparecer sem rolar */
+  @media (max-width: 520px) and (max-height: 720px) {
+    .duelo { height: 140px; }
+    .duelo .lado { font-size: 72px; }
+    .intro-texto { padding: 16px 16px 24px; }
+    .intro-texto p { font-size: 15px; margin-bottom: 8px; }
+    .regras { display: none; }
+    .botao { margin-top: 12px; }
+  }
+  /* no celular o efeito de "passar o mouse" fica grudado depois do toque */
+  @media (hover: none) {
+    .botao:hover { transform: none; box-shadow: 6px 6px 0 var(--vermelho), 12px 12px 0 var(--azul); }
+    .botao.fantasma:hover { background: transparent; color: var(--tinta); box-shadow: none; }
+    .opcao:hover { transform: none; box-shadow: 5px 5px 0 var(--tinta); }
+  }
+  .opcao:active { transform: translate(3px, 3px); box-shadow: 2px 2px 0 var(--tinta); }
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { animation: none !important; transition: none !important; }
+  }
+</style>
+</head>
+<body>
+
+<!-- INTRO -->
+<section class="tela ativa" id="intro">
+  <div class="duelo">
+    <div class="lado listra-azul">22</div>
+    <div class="lado listra-vermelha">13</div>
+    <div class="vs">VS</div>
+  </div>
+  <div class="intro-texto">
+    <span class="etiqueta">2º turno · 25 de outubro · Feito por eleitores da frente democrática</span>
+    <h1>Na dúvida entre <span class="a">22</span> e <span class="v">13</span>?</h1>
+    <p>Este é um joguinho de perguntas e respostas para quem ainda não sabe em quem votar.</p>
+    <p>É fácil: em cada pergunta aparecem <strong>duas frases</strong>. Toque na que você mais concorda. No final, aparece qual número combina mais com você.</p>
+    <div class="regras">
+      <span>16 perguntas</span>
+      <span>Uns 4 minutos</span>
+      <span>Nenhum dado é salvo</span>
+    </div>
+    <button class="botao" id="comecar">Começar o jogo →</button>
+  </div>
+</section>
+
+<!-- QUIZ -->
+<section class="tela" id="quiz">
+  <div class="topo">
+    <div class="topo-linha">
+      <span class="tema" id="tema"></span>
+      <span id="contador"></span>
+    </div>
+    <div class="barra"><i id="progresso"></i></div>
+  </div>
+  <div class="pergunta-box">
+    <div class="icone" id="icone" aria-hidden="true"></div>
+    <h2 id="titulo"></h2>
+    <p class="dica">👇 Toque na frase que você <strong>mais concorda</strong>:</p>
+    <div class="opcoes" id="opcoes"></div>
+    <button class="neutro" id="pular">Não sei responder essa (pular)</button>
+    <div class="nav">
+      <button class="voltar" id="voltar">← Voltar</button>
+    </div>
+  </div>
+</section>
+
+<!-- RESULTADO -->
+<section class="tela" id="resultado">
+  <div class="revelacao" id="revelacao">
+    <span class="pre" id="pre">Suas respostas combinam mais com o</span>
+    <div class="numero-gigante" id="numero"></div>
+    <div class="data">no dia 25 de outubro</div>
+    <p class="afinidade" id="afinidade"></p>
+  </div>
+  <div class="detalhes">
+    <div class="placar">
+      <div id="barra22" class="listra-azul">22</div>
+      <div id="barra13" class="listra-vermelha">13</div>
+    </div>
+    <div class="legenda"><span id="leg22"></span><span id="leg13"></span></div>
+
+    <h3>Suas respostas</h3>
+    <ul class="lista" id="lista"></ul>
+
+    <div class="aviso">
+      <strong>Sobre este quiz:</strong> ele foi feito por eleitores da frente democrática. As frases do 22 usam expressões e propostas reais desse lado, como "passar a boiada", "balbúrdia" e "anistia ampla, geral e irrestrita". Antes de votar, vale ver os debates e ler as propostas de cada candidato no
+      <a href="https://divulgacandcontas.tse.jus.br" target="_blank" rel="noopener">site do TSE</a>.
+    </div>
+
+    <div class="acoes">
+      <button class="botao" id="refazer">Jogar de novo</button>
+      <button class="botao fantasma" id="compartilhar">Compartilhar</button>
+    </div>
+  </div>
+</section>
+
+<script>
+  // Cada pergunta traz uma frase alinhada a cada lado. A ordem é sorteada para
+  // que a posição (A ou B) não entregue de qual número é cada frase.
+  const PERGUNTAS = [
+    {
+      icone: "🏭", tema: "Empresas do governo",
+      titulo: "O que fazer com as empresas do governo, como a Petrobras, os Correios e o Banco do Brasil?",
+      p22: "Privatizar o que der, inclusive a Petrobras. Como fizeram com a Eletrobras: vender para empresários.",
+      p13: "Continuar com o governo. Elas são importantes para o país e o lucro fica com o Brasil."
+    },
+    {
+      icone: "🔫", tema: "Armas",
+      titulo: "Deve ser mais fácil ou mais difícil ter uma arma de fogo?",
+      p22: "Mais fácil. \"Povo armado jamais será escravizado\": liberar a compra de várias armas e munição por pessoa.",
+      p13: "Mais difícil. Mais armas na rua podem causar mais mortes."
+    },
+    {
+      icone: "🚓", tema: "Violência",
+      titulo: "Qual é o melhor jeito de diminuir assaltos, tráfico e violência?",
+      p22: "\"Bandido bom é bandido morto.\" Policial que matar em serviço não deve ser punido (o chamado excludente de ilicitude).",
+      p13: "Polícias trabalhando juntas e investigando mais, e escola e emprego para afastar os jovens do crime."
+    },
+    {
+      icone: "💰", tema: "Gastos e impostos",
+      titulo: "O governo deve gastar mais ou menos? E os impostos?",
+      p22: "Estado mínimo: cortar gastos e investimentos do governo, inclusive em saúde e educação, e deixar o mercado resolver.",
+      p13: "Investir mais em saúde, escola e obras, e quem ganha muito deve pagar mais imposto."
+    },
+    {
+      icone: "💵", tema: "Salário mínimo",
+      titulo: "Todo ano o salário mínimo aumenta. Ele deve subir mais do que os preços no mercado subiram?",
+      p22: "Não. Só repor a inflação, sem ganho real, como foi de 2019 a 2022, para não pesar no bolso dos patrões.",
+      p13: "Sim. Assim o salário compra um pouco mais a cada ano."
+    },
+    {
+      icone: "👷", tema: "Escala 6x1",
+      titulo: "Hoje muita gente trabalha 6 dias e folga só 1 (escala 6x1). Isso deve mudar?",
+      p22: "Não. Acabar com a 6x1 prejudica as empresas. Como disse Bolsonaro, o trabalhador tem que escolher entre \"menos direitos e emprego, ou todos os direitos e desemprego\".",
+      p13: "Deve mudar. O trabalhador deve ter 2 dias de folga por semana, sem perder salário."
+    },
+    {
+      icone: "🌳", tema: "Campo e floresta",
+      titulo: "O que deve vir primeiro: produzir mais no campo ou proteger a floresta?",
+      p22: "Aproveitar para \"passar a boiada\": afrouxar as regras ambientais e aprovar o marco temporal contra as terras indígenas.",
+      p13: "Proteger a Amazônia e as terras indígenas. Dá para produzir mais sem derrubar floresta."
+    },
+    {
+      icone: "🌎", tema: "Outros países",
+      titulo: "O Brasil deve ser mais próximo de quais países?",
+      p22: "Bater continência para os Estados Unidos de Trump, mesmo quando eles taxam os produtos brasileiros e prejudicam quem trabalha aqui.",
+      p13: "De todos, inclusive da China, da Índia, dos países da África e dos vizinhos da América Latina."
+    },
+    {
+      icone: "🏛️", tema: "8 de janeiro",
+      titulo: "Quem invadiu e quebrou os prédios do governo em Brasília, no 8 de janeiro de 2023, deve ser perdoado?",
+      p22: "Sim. \"Anistia ampla, geral e irrestrita\" para todos, inclusive para quem planejou um golpe de Estado.",
+      p13: "Não. Essas pessoas devem cumprir as penas que a Justiça decidiu."
+    },
+    {
+      icone: "⚖️", tema: "STF",
+      titulo: "O STF, que é o tribunal mais alto do país, tem poder demais?",
+      p22: "Sim. Tem que dar impeachment em ministros do STF, como o Alexandre de Moraes.",
+      p13: "Não. O STF protege a Constituição e deve continuar com o poder que tem."
+    },
+    {
+      icone: "📱", tema: "Redes sociais",
+      titulo: "Deve haver regras contra notícias falsas (fake news) no WhatsApp, Instagram e TikTok?",
+      p22: "Não. Qualquer regra é \"censura\". As empresas das redes não devem responder pelas mentiras que circulam nelas.",
+      p13: "Sim. As empresas donas das redes devem ser punidas quando deixam espalhar mentiras e crimes."
+    },
+    {
+      icone: "🏫", tema: "Escola",
+      titulo: "Como deve ser a escola pública?",
+      p22: "Escola cívico-militar e \"Escola sem Partido\", contra a \"doutrinação\" e a \"ideologia de gênero\" nas salas de aula.",
+      p13: "Funcionando o dia todo, com mais dinheiro para os professores e para as faculdades públicas."
+    },
+    {
+      icone: "🏥", tema: "SUS e Farmácia Popular",
+      titulo: "Como melhorar o SUS e a Farmácia Popular, que dá remédios de graça ou baratos?",
+      p22: "Apertar o cinto: cortar a verba da Farmácia Popular, como foi proposto no orçamento de 2023, e passar mais coisa para hospitais particulares.",
+      p13: "Colocar mais dinheiro no SUS e ter mais remédios de graça na Farmácia Popular."
+    },
+    {
+      icone: "🏠", tema: "Minha Casa Minha Vida",
+      titulo: "Como o governo deve ajudar as pessoas a ter a casa própria, no Minha Casa Minha Vida?",
+      p22: "Trocar o programa por outro nome e quase parar de construir casas para quem ganha menos, como aconteceu no Casa Verde e Amarela.",
+      p13: "Construindo mais casas, com parcelas que cabem no bolso de quem ganha menos."
+    },
+    {
+      icone: "👨‍👩‍👧", tema: "Bolsa Família",
+      titulo: "Como deve ser o Bolsa Família, o dinheiro que o governo paga todo mês a algumas famílias?",
+      p22: "É \"bolsa esmola\", e muita gente que recebe \"não quer trabalhar\". Tem que passar um pente-fino e cortar.",
+      p13: "Deve continuar e aumentar, com um valor a mais para cada criança da família."
+    },
+    {
+      icone: "🎓", tema: "Prouni e Fies",
+      titulo: "O governo deve ajudar quem quer fazer faculdade, com bolsas (Prouni) e crédito para pagar (Fies)?",
+      p22: "Ajudar menos. Universidade é lugar de \"balbúrdia\": cortar verba e diminuir as vagas do Fies.",
+      p13: "Ajudar mais. Dar mais bolsas de estudo e mais crédito para pagar a faculdade."
+    }
+  ];
+
+  const $ = (id) => document.getElementById(id);
+  let ordem = [];        // para cada pergunta: true = frase do 22 aparece primeiro
+  let respostas = [];    // "22" | "13" | "0" (sem opinião)
+  let atual = 0;
+
+  function mostrar(id) {
+    document.querySelectorAll(".tela").forEach((t) => t.classList.remove("ativa"));
+    $(id).classList.add("ativa");
+    window.scrollTo(0, 0);
+  }
+
+  function iniciar() {
+    ordem = PERGUNTAS.map(() => Math.random() < 0.5);
+    respostas = new Array(PERGUNTAS.length).fill(null);
+    atual = 0;
+    travado = false;
+    renderPergunta();
+    mostrar("quiz");
+  }
+
+  function renderPergunta() {
+    const p = PERGUNTAS[atual];
+    $("tema").textContent = p.tema;
+    $("contador").textContent = `${atual + 1} / ${PERGUNTAS.length}`;
+    $("progresso").style.width = `${(atual / PERGUNTAS.length) * 100}%`;
+    $("icone").textContent = p.icone;
+    $("titulo").textContent = p.titulo;
+    $("voltar").disabled = atual === 0;
+
+    const itens = ordem[atual] ? [["22", p.p22], ["13", p.p13]] : [["13", p.p13], ["22", p.p22]];
+    const box = $("opcoes");
+    box.innerHTML = "";
+    itens.forEach(([lado, texto], i) => {
+      const b = document.createElement("button");
+      b.className = "opcao" + (respostas[atual] === lado ? " escolhida" : "");
+      b.dataset.letra = "AB"[i];
+      b.textContent = texto;
+      b.onclick = () => responder(lado, b);
+      box.appendChild(b);
+    });
+  }
+
+  // trava enquanto a próxima pergunta não aparece, para um toque duplo não pular perguntas
+  let travado = false;
+
+  function responder(lado, botao) {
+    if (travado) return;
+    travado = true;
+    respostas[atual] = lado;
+    if (botao) {
+      document.querySelectorAll(".opcao").forEach((o) => o.classList.remove("escolhida"));
+      botao.classList.add("escolhida");
+    }
+    setTimeout(avancar, botao ? 280 : 0);
+  }
+
+  function avancar() {
+    if (atual < PERGUNTAS.length - 1) {
+      atual++;
+      renderPergunta();
+      window.scrollTo(0, 0);
+      travado = false;
+    } else {
+      $("progresso").style.width = "100%";
+      setTimeout(() => { resultado(); travado = false; }, 250);
+    }
+  }
+
+  function resultado() {
+    const n22 = respostas.filter((r) => r === "22").length;
+    const n13 = respostas.filter((r) => r === "13").length;
+    const total = n22 + n13;
+    const rev = $("revelacao");
+    rev.className = "revelacao";
+
+    if (total === 0) {
+      rev.classList.add("empate");
+      $("pre").textContent = "Você não escolheu nenhum lado";
+      $("numero").textContent = "?";
+      $("afinidade").textContent = "Que tal jogar de novo e escolher a frase mais próxima de você, mesmo que não seja perfeita?";
+    } else if (n22 === n13) {
+      rev.classList.add("empate");
+      $("pre").textContent = "Deu empate! Você está bem dividido";
+      $("numero").textContent = "22 · 13";
+      $("afinidade").textContent = "Vale pesar quais temas são mais importantes para você e ver os debates antes do dia da eleição.";
+    } else {
+      const vence = n22 > n13 ? "22" : "13";
+      const pct = Math.round((Math.max(n22, n13) / total) * 100);
+      rev.classList.add(vence === "22" ? "listra-azul" : "listra-vermelha");
+      $("pre").textContent = "Suas respostas combinam mais com o";
+      $("numero").textContent = vence;
+      $("afinidade").textContent = `De cada 10 respostas suas, mais ou menos ${Math.round(pct / 10)} combinam com o ${vence}.`;
+    }
+    // reinicia a animação do número
+    const num = $("numero");
+    num.style.animation = "none"; void num.offsetWidth; num.style.animation = "";
+
+    const p22 = total ? Math.round((n22 / total) * 100) : 50;
+    $("barra22").style.width = "50%";
+    $("barra13").style.width = "50%";
+    $("barra22").textContent = n22 ? "22" : "";
+    $("barra13").textContent = n13 ? "13" : "";
+    setTimeout(() => {
+      $("barra22").style.width = p22 + "%";
+      $("barra13").style.width = (100 - p22) + "%";
+    }, 300);
+    $("leg22").textContent = `22 · ${n22} resposta${n22 === 1 ? "" : "s"}`;
+    $("leg13").textContent = `13 · ${n13} resposta${n13 === 1 ? "" : "s"}`;
+
+    const lista = $("lista");
+    lista.innerHTML = "";
+    PERGUNTAS.forEach((p, i) => {
+      const r = respostas[i];
+      const li = document.createElement("li");
+      const selo = document.createElement("span");
+      selo.className = "selo s" + r;
+      selo.textContent = r === "0" ? "—" : r;
+      const txt = document.createElement("span");
+      txt.textContent = r === "0" ? `${p.tema}: pulou` : `${p.tema}: ${r === "22" ? p.p22 : p.p13}`;
+      li.append(selo, txt);
+      lista.appendChild(li);
+    });
+
+    mostrar("resultado");
+  }
+
+  async function compartilhar() {
+    const dados = { title: "22 ou 13?", text: "Na dúvida no segundo turno? Faça esse quiz e veja com qual lado você mais concorda:", url: location.href };
+    try {
+      if (navigator.share) { await navigator.share(dados); return; }
+      await navigator.clipboard.writeText(`${dados.text} ${dados.url}`);
+      $("compartilhar").textContent = "Link copiado!";
+      setTimeout(() => ($("compartilhar").textContent = "Compartilhar"), 2000);
+    } catch (e) { /* usuário cancelou */ }
+  }
+
+  $("comecar").onclick = iniciar;
+  $("refazer").onclick = iniciar;
+  $("pular").onclick = () => responder("0");
+  $("voltar").onclick = () => { if (!travado && atual > 0) { atual--; renderPergunta(); window.scrollTo(0, 0); } };
+  $("compartilhar").onclick = compartilhar;
+
+  // teclado: A/B ou 1/2 para escolher
+  document.addEventListener("keydown", (e) => {
+    if (!$("quiz").classList.contains("ativa")) return;
+    const k = e.key.toLowerCase();
+    const ops = document.querySelectorAll(".opcao");
+    if ((k === "a" || k === "1") && ops[0]) ops[0].click();
+    if ((k === "b" || k === "2") && ops[1]) ops[1].click();
+  });
+</script>
+</body>
+</html>
